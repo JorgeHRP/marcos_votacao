@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resultados — {{ titulo }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --card: #161920;
+      --border: #252830;
+      --gold: #c9a84c;
+      --gold-light: #e2c378;
+      --gold-dim: rgba(201,168,76,0.12);
+      --text: #eae6df;
+      --muted: #7a7a8c;
+      --success: #5cb88a;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 28px 16px 60px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 40% at 20% 10%, rgba(201,168,76,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .container { max-width: 640px; margin: 0 auto; position: relative; }
+
+    .header { text-align: center; margin-bottom: 32px; }
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: var(--gold-light);
+    }
+    .header p { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+
+    .result-row {
+      margin-bottom: 18px;
+    }
+
+    .result-row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .result-label { font-size: 15px; font-weight: 500; }
+    .result-count { font-size: 13px; color: var(--muted); }
+
+    .bar-track {
+      height: 8px;
+      background: var(--bg);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+      border-radius: 4px;
+      transition: width 0.8s ease;
+    }
+
+    .total-badge {
+      display: inline-block;
+      background: var(--gold-dim);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      color: var(--gold-light);
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      text-align: left;
+      padding: 8px 10px;
+      color: var(--muted);
+      font-weight: 400;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(37,40,48,0.5);
+      color: var(--text);
+    }
+    tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-block;
+      background: rgba(92,184,138,0.12);
+      border: 1px solid rgba(92,184,138,0.25);
+      color: var(--success);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 12px;
+    }
+
+    .refresh-btn {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      padding: 12px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      width: 100%;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📊 Resultados</h1>
+    <p>{{ titulo }}</p>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Apuramento</div>
+    <div class="total-badge">{{ total }} voto{{ 's' if total != 1 else '' }} registado{{ 's' if total != 1 else '' }}</div>
+
+    {% for opcao, count in contagem.items() %}
+    {% set pct = (count / total * 100)|round(1) if total > 0 else 0 %}
+    <div class="result-row">
+      <div class="result-row-top">
+        <span class="result-label">{{ opcao }}</span>
+        <span class="result-count">{{ count }} voto{{ 's' if count != 1 else '' }} — {{ pct }}%</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width: {{ pct }}%"></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if votos %}
+  <div class="card">
+    <div class="section-title">Lista de votantes</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Opção</th>
+          <th>Hora</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for voto in votos %}
+        <tr>
+          <td>{{ voto.nome }}</td>
+          <td><span class="badge">{{ voto.opcao }}</span></td>
+          <td style="color:var(--muted);">{{ voto.votado_em[:16].replace('T',' ') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <a class="refresh-btn" href="/admin/resultados">↻ Atualizar resultados</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>{{ titulo }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --card: #161920;
+      --border: #252830;
+      --gold: #c9a84c;
+      --gold-light: #e2c378;
+      --gold-dim: rgba(201,168,76,0.12);
+      --text: #eae6df;
+      --muted: #7a7a8c;
+      --error: #e05c5c;
+      --success: #5cb88a;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+    }
+
+    /* Subtle background pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 10%, rgba(201,168,76,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 90%, rgba(201,168,76,0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .header-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 24px;
+    }
+
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--gold-light);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 6px;
+      font-weight: 300;
+    }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      margin-bottom: 16px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.2s; }
+
+    .step-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Form fields */
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+
+    input[type="text"], input[type="tel"], select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 16px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--gold);
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a7a8c' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    .phone-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .phone-row select { width: auto; min-width: 140px; flex-shrink: 0; }
+    .phone-row input  { flex: 1; }
+
+    /* Options */
+    .options { display: flex; flex-direction: column; gap: 10px; }
+
+    .option-btn {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.2s, background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .option-btn .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .option-btn.selected {
+      border-color: var(--gold);
+      background: var(--gold-dim);
+    }
+
+    .option-btn.selected .dot {
+      border-color: var(--gold);
+      background: var(--gold);
+    }
+
+    /* Code input */
+    .code-input {
+      text-align: center;
+      letter-spacing: 8px;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold) 0%, #a8872f 100%);
+      color: #0d0f14;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Alert */
+    .alert {
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .alert.error   { background: rgba(224,92,92,0.12); border: 1px solid rgba(224,92,92,0.3); color: var(--error); }
+    .alert.success { background: rgba(92,184,138,0.12); border: 1px solid rgba(92,184,138,0.3); color: var(--success); }
+    .alert.show    { display: block; }
+
+    /* Success screen */
+    #success-screen {
+      display: none;
+      text-align: center;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(92,184,138,0.12);
+      border: 1px solid rgba(92,184,138,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 32px;
+    }
+
+    #success-screen h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--success);
+      margin-bottom: 8px;
+    }
+
+    #success-screen p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    #success-screen .chosen {
+      display: inline-block;
+      margin-top: 16px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 15px;
+      color: var(--gold-light);
+      font-weight: 500;
+    }
+
+    /* Closed state */
+    .closed-banner {
+      text-align: center;
+      padding: 32px 24px;
+    }
+    .closed-banner .icon { font-size: 48px; margin-bottom: 16px; }
+    .closed-banner h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--muted); margin-bottom: 8px; }
+    .closed-banner p { color: var(--muted); font-size: 14px; font-weight: 300; }
+
+    /* Hint */
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 16px;
+      font-weight: 300;
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(0,0,0,0.3);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-icon">🕊️</div>
+    <h1>{{ titulo }}</h1>
+    <p>Votação segura via WhatsApp</p>
+  </div>
+
+  {% if not votacao_aberta %}
+  <div class="card">
+    <div class="closed-banner">
+      <div class="icon">🔒</div>
+      <h2>Votação encerrada</h2>
+      <p>A votação já foi concluída.<br>Obrigado pela participação!</p>
+    </div>
+  </div>
+
+  {% else %}
+
+  <!-- Tela de votação -->
+  <div id="voting-screen">
+
+    <!-- Passo 1: Dados + opção -->
+    <div class="card" id="step1">
+      <div class="step-label">1 — Identificação</div>
+
+      <div class="field">
+        <label>Seu nome completo</label>
+        <input type="text" id="nome" placeholder="Ex: Maria Fernanda" autocomplete="name" />
+      </div>
+
+      <div class="field">
+        <label>Número do WhatsApp</label>
+        <div class="phone-row">
+          <select id="ddi">
+            <option value="+351">🇵🇹 +351</option>
+            <option value="+55">🇧🇷 +55</option>
+            <option value="+1">🇺🇸 +1</option>
+            <option value="+44">🇬🇧 +44</option>
+            <option value="+34">🇪🇸 +34</option>
+            <option value="+33">🇫🇷 +33</option>
+            <option value="+49">🇩🇪 +49</option>
+            <option value="+39">🇮🇹 +39</option>
+            <option value="+244">🇦🇴 +244</option>
+            <option value="+258">🇲🇿 +258</option>
+          </select>
+          <input type="tel" id="telefone" placeholder="912 345 678" inputmode="numeric" />
+        </div>
+      </div>
+
+      <div class="step-label" style="margin-top:24px;">2 — Sua escolha</div>
+
+      <div class="options" id="opcoes-list">
+        {% for opcao in opcoes %}
+        <button class="option-btn" data-opcao="{{ opcao }}" onclick="selecionarOpcao(this)">
+          <span class="dot"></span>
+          <span>{{ opcao }}</span>
+        </button>
+        {% endfor %}
+      </div>
+
+      <div id="alert1" class="alert error"></div>
+
+      <button class="btn btn-primary" id="btn-enviar" onclick="enviarCodigo()">
+        Enviar código pelo WhatsApp
+      </button>
+      <p class="hint">Um código de 6 dígitos será enviado para confirmar seu voto.</p>
+    </div>
+
+    <!-- Passo 2: Código -->
+    <div class="card" id="step2" style="display:none;">
+      <div class="step-label">3 — Verificação</div>
+
+      <p style="font-size:14px; color:var(--muted); margin-bottom:20px; line-height:1.6;">
+        Enviamos um código de 6 dígitos para o seu WhatsApp.<br>
+        Cole-o abaixo para confirmar seu voto.
+      </p>
+
+      <div class="field">
+        <label>Código de verificação</label>
+        <input type="tel" id="codigo" class="code-input" placeholder="000000"
+               maxlength="6" inputmode="numeric"
+               oninput="this.value = this.value.replace(/\D/g,'')" />
+      </div>
+
+      <div id="alert2" class="alert error"></div>
+
+      <button class="btn btn-primary" id="btn-verificar" onclick="verificarCodigo()">
+        Confirmar voto ✓
+      </button>
+      <button class="btn btn-secondary" onclick="voltarPasso1()">
+        ← Alterar dados ou opção
+      </button>
+      <button class="btn btn-secondary" id="btn-reenviar" onclick="reenviarCodigo()">
+        Reenviar código
+      </button>
+    </div>
+  </div>
+
+  <!-- Tela de sucesso -->
+  <div id="success-screen">
+    <div class="card" style="padding:40px 24px;">
+      <div class="success-icon">✓</div>
+      <h2>Voto registado!</h2>
+      <p>A sua participação foi confirmada com sucesso.<br>Obrigado!</p>
+      <div class="chosen" id="opcao-escolhida"></div>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+
+<script>
+  let opcaoSelecionada = null;
+
+  function selecionarOpcao(btn) {
+    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    opcaoSelecionada = btn.dataset.opcao;
+  }
+
+  function showAlert(id, msg, type='error') {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'alert ' + type + ' show';
+  }
+
+  function hideAlert(id) {
+    document.getElementById(id).className = 'alert';
+  }
+
+  function setLoading(btnId, loading) {
+    const btn = document.getElementById(btnId);
+    if (loading) {
+      btn._text = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner"></span> Aguarde...';
+      btn.disabled = true;
+    } else {
+      btn.innerHTML = btn._text;
+      btn.disabled = false;
+    }
+  }
+
+  async function enviarCodigo() {
+    hideAlert('alert1');
+    const nome = document.getElementById('nome').value.trim();
+    const ddi = document.getElementById('ddi').value;
+    const tel = document.getElementById('telefone').value.trim().replace(/\D/g,'');
+
+    if (!nome) { showAlert('alert1', 'Por favor, insira o seu nome.'); return; }
+    if (!tel || tel.length < 7) { showAlert('alert1', 'Por favor, insira um número de telefone válido.'); return; }
+    if (!opcaoSelecionada) { showAlert('alert1', 'Por favor, selecione uma opção antes de continuar.'); return; }
+
+    setLoading('btn-enviar', true);
+
+    try {
+      const res = await fetch('/api/enviar-codigo', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ nome, ddi, telefone: tel })
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+      } else {
+        showAlert('alert1', data.erro || 'Erro ao enviar código.');
+      }
+    } catch {
+      showAlert('alert1', 'Erro de conexão. Tente novamente.');
+    } finally {
+      setLoading('btn-enviar', false);
+    }
+  }
+
+  async function verificarCodigo() {
+    hideAlert('alert2');
+    const codigo = document.getElementById('codigo').value.trim();
+
+    if (codigo.length !== 6) { showAlert('alert2', 'O código deve ter 6 dígitos.'); return; }
+    if (!opcaoSelecionada) { showAlert('alert2', 'Opção não selecionada. Volte e escolha.'); return; }
+
+    setLoading('btn-verificar', true);
+
+    try {
+      const res = await fetch('/api/verificar-codigo', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ codigo, opcao: opcaoSelecionada })
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        document.getElementById('voting-screen').style.display = 'none';
+        document.getElementById('success-screen').style.display = 'block';
+        document.getElementById('opcao-escolhida').textContent = '✓ ' + data.opcao;
+      } else {
+        showAlert('alert2', data.erro || 'Código incorreto.');
+      }
+    } catch {
+      showAlert('alert2', 'Erro de conexão. Tente novamente.');
+    } finally {
+      setLoading('btn-verificar', false);
+    }
+  }
+
+  async function reenviarCodigo() {
+    hideAlert('alert2');
+    const nome = document.getElementById('nome').value.trim();
+    const ddi = document.getElementById('ddi').value;
+    const tel = document.getElementById('telefone').value.trim().replace(/\D/g,'');
+
+    const btn = document.getElementById('btn-reenviar');
+    btn.disabled = true;
+    btn.textContent = 'A enviar...';
+
+    try {
+      const res = await fetch('/api/enviar-codigo', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ nome, ddi, telefone: tel })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showAlert('alert2', 'Novo código enviado!', 'success');
+        document.getElementById('codigo').value = '';
+      } else {
+        showAlert('alert2', data.erro || 'Erro ao reenviar.');
+      }
+    } catch {
+      showAlert('alert2', 'Erro de conexão.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Reenviar código';
+    }
+  }
+
+  function voltarPasso1() {
+    hideAlert('alert2');
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step1').style.display = 'block';
+  }
+</script>
+</body>
+</html>
