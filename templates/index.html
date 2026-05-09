@@ -167,8 +167,11 @@
     .phone-row input  { flex: 1; }
 
     /* Options */
-    .options { display: flex; flex-direction: column; gap: 10px; }
-
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
     .option-btn {
       width: 100%;
       background: var(--bg);
@@ -390,7 +393,7 @@
             <option value="+244">🇦🇴 +244</option>
             <option value="+258">🇲🇿 +258</option>
           </select>
-          <input type="tel" id="telefone" placeholder="912 345 678" inputmode="numeric" />
+          <input type="tel" id="telefone" placeholder="912 345 678" inputmode="numeric" maxlength="9" />
         </div>
       </div>
 
@@ -458,6 +461,21 @@
 
 <script>
   let opcaoSelecionada = null;
+
+  document.getElementById('ddi').addEventListener('change', function() {
+    const tel = document.getElementById('telefone');
+    if (this.value === '+55') {
+      tel.maxLength = 11;
+      tel.placeholder = '11 91234 5678';
+    } else if (this.value === '+351') {
+      tel.maxLength = 9;
+      tel.placeholder = '912 345 678';
+    } else {
+      tel.maxLength = 12;
+      tel.placeholder = '000 000 0000';
+    }
+    tel.value = '';
+  });
 
   function selecionarOpcao(btn) {
     document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
